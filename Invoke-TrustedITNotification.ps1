@@ -31,7 +31,7 @@ if (-not(Get-Module -Name BurntToast -ListAvailable)) {
         Write-Output "Could not install module: BurntToast: $_"
     }
 }
-Import-Module -Name BurntToast
+Import-Module -Name "C:\Program Files\WindowsPowerShell\Modules\BurntToast"
 
 
 # ===[ Download Images ]===
