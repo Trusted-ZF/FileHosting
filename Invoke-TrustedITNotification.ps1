@@ -24,7 +24,7 @@ if ("$Preset" -notin $AcceptedPresets) {
 if (-not(Get-Module -Name BurntToast -ListAvailable)) {
     try {
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-        Install-Module -Name BurntToast -Scope CurrentUser -AcceptLicense:$true | Out-Null
+        Install-Module -Name BurntToast -Scope CurrentUser -AcceptLicense | Out-Null
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Untrusted
     }
     catch {
