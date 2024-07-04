@@ -24,14 +24,14 @@ if ("$Preset" -notin $AcceptedPresets) {
 if (-not(Get-Module -Name BurntToast -ListAvailable)) {
     try {
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-        Install-Module -Name BurntToast -Scope AllUsers -AcceptLicense:$true | Out-Null
+        Install-Module -Name BurntToast -Scope CurrentUser -AcceptLicense:$true | Out-Null
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Untrusted
     }
     catch {
         Write-Output "Could not install module: BurntToast: $_"
     }
 }
-Import-Module -Name "C:\Program Files\WindowsPowerShell\Modules\BurntToast"
+Import-Module -Name BurntToast
 
 
 # ===[ Download Images ]===
