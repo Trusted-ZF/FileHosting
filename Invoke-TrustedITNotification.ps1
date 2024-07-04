@@ -15,13 +15,9 @@ param (
 
 # ===[ Verify Technician Input ]===
 $AcceptedPresets = @("Reboot")
-if ("@Preset@" -notin $AcceptedPresets) {
+if ("$Preset" -notin $AcceptedPresets) {
     Write-Output "Not an accepted preset. Try one of: $AcceptedPresets."
 }
-
-
-# ===[ Variables ]===
-$Preset = "@Preset@"
 
 
 # ===[ Install Modules ]===
