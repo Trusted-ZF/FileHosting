@@ -7,14 +7,14 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $true)]
-    [ValidateSet("Reboot")]
+    [ValidateSet("Reboot", "ServerProblem")]
     [string]
     $Preset
 )
 
 
 # ===[ Verify Technician Input ]===
-$AcceptedPresets = @("Reboot")
+$AcceptedPresets = @("Reboot", "ServerProblem")
 if ("$Preset" -notin $AcceptedPresets) {
     Write-Output "Not an accepted preset. Try one of: $AcceptedPresets."
 }
@@ -91,7 +91,36 @@ switch ($Preset) {
             Write-Output "Error sending notification to user: $_"
         }
 
-        Write-Output "Script completed! $_"
+        Write-Output "Script completed!"
+        exit 0
+    }
+
+    "ServerProblem" {
+        try {
+            $BTText = New-BTText -Text "We're aware of a problem with the server and we're working on it. We'll update you as soon as possible."
+            $IconImage = New-BTImage -Source $IconPath -AppLogoOverride -Crop Circle
+            $HeroImage = New-BTImage -Source $HeroPath -HeroImage
+            $Audio = New-BTAudio -Source ms-winsoundevent:Notification.Looping.Call2
+            $ActionButton = New-BTButton -Content "Please keep me updated." -Arguments "TODO"
+            $DismissButton = New-BTButton -Content "I understand, thank you." -Dismiss
+            $ButtonHolder = New-BTAction -Buttons $ActionButton, $DismissButton
+
+            $Binding = New-BTBinding -Children $BTText -AppLogoOverride $IconImage -HeroImage $HeroImage
+            $Visual = New-BTVisual -BindingGeneric $Binding
+            $Content = New-BTContent -Visual $Visual -Audio $Audio -Duration Long -Scenario IncomingCall -Actions $ButtonHolder
+        }
+        catch {
+            Write-Output "Error when setting notification parameters: $_"
+        }
+
+        try {
+            Submit-BTNotification -Content $Content
+        }
+        catch {
+            Write-Output "Error sending notification to user: $_"
+        }
+
+        Write-Output "Script completed!"
         exit 0
     }
 }
