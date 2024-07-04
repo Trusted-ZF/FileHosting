@@ -4,6 +4,15 @@
 #>
 
 
+[CmdletBinding()]
+param (
+    [Parameter(Mandatory = $true)]
+    [ValidateSet("Reboot")]
+    [string]
+    $Preset
+)
+
+
 # ===[ Verify Technician Input ]===
 $AcceptedPresets = @("Reboot")
 if ("@Preset@" -notin $AcceptedPresets) {
