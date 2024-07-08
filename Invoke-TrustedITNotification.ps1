@@ -104,7 +104,7 @@ switch ($Preset) {
         }
 
         try {
-            Submit-BTNotification -Content $Content -AppId "Trusted"
+            Submit-BTNotification -Content $Content -AppId "Trusted IT"
         }
         catch {
             Write-Output "Error sending notification to user: $_"
