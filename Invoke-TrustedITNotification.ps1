@@ -69,10 +69,6 @@ catch {
 }
 
 
-# ===[ Register the Notification App ]===
-New-BTAppID -AppId "TrustedIT"
-
-
 # ===[ Send Notification ]===
 switch ($Preset) {
     "Reboot" {
@@ -104,7 +100,7 @@ switch ($Preset) {
         }
 
         try {
-            Submit-BTNotification -Content $Content -AppId "TrustedIT"
+            Submit-BTNotification -Content $Content
         }
         catch {
             Write-Output "Error sending notification to user: $_"
