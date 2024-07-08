@@ -9,7 +9,7 @@ param (
     [Parameter(Mandatory = $true)]
     [ValidateSet("Reboot", "ServerProblem")]
     [string]
-    $Preset
+    $Preset = "Reboot"
 )
 
 
@@ -17,6 +17,21 @@ param (
 $AcceptedPresets = @("Reboot", "ServerProblem")
 if ("$Preset" -notin $AcceptedPresets) {
     Write-Output "Not an accepted preset. Try one of: $AcceptedPresets."
+}
+
+
+# ===[ Create a Protocol ]===
+# Restarts immediately when the user clicks "Reboot Now" on the "Reboot" preset
+New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT -ErrorAction SilentlyContinue | Out-Null
+$Handler = Get-Item "HKCR:\TrustedITReboot" -ErrorAction SilentlyContinue
+if (-not $Handler) {
+    New-Item -Path "HKCR:\TrustedITReboot" -Force
+    Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "(DEFAULT)" -Value "url:TrustedITReboot" -Force
+    Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "URL Protocol" -Value "" -Force
+    New-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "EditFlage" -PropertyType DWORD -Value 2162688
+    
+    New-Item -Path "HKCR:\TrustedITReboot\Shell\Open\Command" -Force
+    Set-ItemProperty "HKCR:\TrustedITReboot\Shell\Open\Command" -Name "(DEFAULT)" -Value "C:\Windows\System32\shutdown.exe -r -t 0" -Force
 }
 
 
@@ -72,7 +87,7 @@ switch ($Preset) {
             $IconImage = New-BTImage -Source $IconPath -AppLogoOverride -Crop Circle
             $HeroImage = New-BTImage -Source $HeroPath -HeroImage
             $Audio = New-BTAudio -Source ms-winsoundevent:Notification.Looping.Call2
-            $ActionButton = New-BTButton -Content "Restart now" -Arguments "TODO"
+            $ActionButton = New-BTButton -Content "Restart now" -Arguments "TrustedITReboot:" -ActivationType Protocol
             $DismissButton = New-BTButton -Content "Remind me later" -Snooze -Id "SnoozeTime"
             $ButtonHolder = New-BTAction -Buttons $DismissButton, $ActionButton -Inputs $SelectionBox
 
