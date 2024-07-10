@@ -29,7 +29,7 @@ New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT -ErrorAction
 $Handler = Get-Item "HKCR:\TrustedITReboot" -ErrorAction SilentlyContinue
 if (-not $Handler) {
     New-Item -Path "HKCR:\TrustedITReboot" -Force
-    Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "(DEFAULT)" -Value "url:TrustedITReboot" -Force
+    Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "(DEFAULT)" -Value "TrustedITReboot" -Force
     Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "URL Protocol" -Value "" -Force
     New-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "EditFlage" -PropertyType DWORD -Value 2162688
     
