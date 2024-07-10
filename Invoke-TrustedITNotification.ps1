@@ -31,7 +31,7 @@ if (-not $Handler) {
     New-Item -Path "HKCR:\TrustedITReboot" -Force
     Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "(DEFAULT)" -Value "TrustedITReboot" -Force
     Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "URL Protocol" -Value "" -Force
-    New-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "EditFlage" -PropertyType DWORD -Value 2162688
+    New-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "EditFlags" -PropertyType DWORD -Value 2162688
     
     New-Item -Path "HKCR:\TrustedITReboot\Shell\Open\Command" -Force
     Set-ItemProperty "HKCR:\TrustedITReboot\Shell\Open\Command" -Name "(DEFAULT)" -Value "C:\Windows\System32\shutdown.exe -r -t 00" -Force
