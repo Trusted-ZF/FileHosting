@@ -4,6 +4,7 @@
 #>
 
 
+
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $true)]
@@ -13,11 +14,13 @@ param (
 )
 
 
+
 # ===[ Verify Technician Input ]===
 $AcceptedPresets = @("Reboot", "ServerProblem")
 if ("$Preset" -notin $AcceptedPresets) {
     Write-Output "Not an accepted preset. Try one of: $AcceptedPresets."
 }
+
 
 
 # ===[ Create a Protocol ]===
@@ -31,8 +34,9 @@ if (-not $Handler) {
     New-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "EditFlage" -PropertyType DWORD -Value 2162688
     
     New-Item -Path "HKCR:\TrustedITReboot\Shell\Open\Command" -Force
-    Set-ItemProperty "HKCR:\TrustedITReboot\Shell\Open\Command" -Name "(DEFAULT)" -Value "C:\Windows\System32\shutdown.exe -r -t 0" -Force
+    Set-ItemProperty "HKCR:\TrustedITReboot\Shell\Open\Command" -Name "(DEFAULT)" -Value "C:\Windows\System32\shutdown.exe -r -t 00" -Force
 }
+
 
 
 # ===[ Install Modules ]===
@@ -49,24 +53,42 @@ if (-not(Get-Module -Name BurntToast -ListAvailable)) {
 Import-Module -Name BurntToast
 
 
+
 # ===[ Download Images ]===
 try {
-    $HeroURL    = "https://raw.githubusercontent.com/Trusted-ZF/ToastNotifications/main/TrustedITLogo_Hero.jpg"
-    Invoke-WebRequest -Uri $HeroURL -OutFile "$env:TEMP\TrustedITLogo_Hero.jpg"
-    $HeroPath = "$env:TEMP\TrustedITLogo_Hero.jpg"
+    if (-not (Test-Path -Path "C:\ProgramData\Trusted IT")) {
+        New-Item -Path "C:\ProgramData\Trusted IT"
+    }
+    $WorkingFolder = "C:\ProgramData\Trusted IT"
+}
+catch {
+    Write-Output "Could not create working folder: $_"
+}
+
+
+try {
+    if (-not (Test-Path -Path "$WorkingFolder\TrustedITLogo_Hero.jpg")) {
+        $HeroURL    = "https://raw.githubusercontent.com/Trusted-ZF/ToastNotifications/main/TrustedITLogo_Hero.jpg"
+        Invoke-WebRequest -Uri $HeroURL -OutFile "$WorkingFolder\TrustedITLogo_Hero.jpg"
+    }
+    $HeroPath = "$WorkingFolder\TrustedITLogo_Hero.jpg"
 }
 catch {
     Write-Output "Could not download hero image: $_"
 }
 
+
 try {
-    $IconURL    = "https://raw.githubusercontent.com/Trusted-ZF/ToastNotifications/main/TrustedITMSP_Icon.png"
-    Invoke-WebRequest -Uri $IconURL -OutFile "$env:TEMP\TrustedITMSP_Icon.png"
-    $IconPath   = "$env:TEMP\TrustedITMSP_Icon.png"
+    if (-not (Test-Path -Path "$WorkingFolder\TrustedITMSP_Icon.png")) {
+        $IconURL    = "https://raw.githubusercontent.com/Trusted-ZF/ToastNotifications/main/TrustedITMSP_Icon.png"
+        Invoke-WebRequest -Uri $IconURL -OutFile "$WorkingFolder\TrustedITMSP_Icon.png"
+    }
+    $IconPath   = "$WorkingFolder\TrustedITMSP_Icon.png"
 }
 catch {
     Write-Output "Could not download app logo image: $_"
 }
+
 
 
 # ===[ Send Notification ]===
@@ -99,12 +121,14 @@ switch ($Preset) {
             Write-Output "Error when setting notification parameters: $_"
         }
 
+
         try {
             Submit-BTNotification -Content $Content
         }
         catch {
             Write-Output "Error sending notification to user: $_"
         }
+
 
         Write-Output "Script completed!"
         exit 0
@@ -128,12 +152,14 @@ switch ($Preset) {
             Write-Output "Error when setting notification parameters: $_"
         }
 
+
         try {
             Submit-BTNotification -Content $Content
         }
         catch {
             Write-Output "Error sending notification to user: $_"
         }
+
 
         Write-Output "Script completed!"
         exit 0
