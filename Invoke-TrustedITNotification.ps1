@@ -57,7 +57,7 @@ Import-Module -Name BurntToast
 # ===[ Download Images ]===
 try {
     if (-not (Test-Path -Path "C:\ProgramData\Trusted IT")) {
-        New-Item -Path "C:\ProgramData\Trusted IT"
+        New-Item -Path "C:\ProgramData\Trusted IT" -ItemType Directory
     }
     $WorkingFolder = "C:\ProgramData\Trusted IT"
 }
