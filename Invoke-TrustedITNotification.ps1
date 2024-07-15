@@ -91,6 +91,30 @@ catch {
 
 
 
+# ===[ Set Custom Notification App ]===
+try {
+    New-BTAppId -AppId "TrustedIT.Notifications"
+    
+    $RegPath    = "HKCU:\Software\Classes\AppUserModelId"
+    $AppIdPath  = "$RegPath\TrustedIT.Notifications"
+    if (-not (Test-Path $AppIdPath)) { New-Item -Path $RegPath -Name "TrustedIT.Notifications" -Force | Out-Null }
+
+    $DisplayName = (Get-ItemProperty -Path $AppIdPath -Name DisplayName -ErrorAction SilentlyContinue).DisplayName
+    if ($DisplayName -ne "Trusted IT") {
+        New-ItemProperty -Path $AppIdPath -Name DisplayName -Value "Trusted IT" -PropertyType String -Force | Out-Null
+    }
+
+    $IconPath = (Get-ItemProperty -Path $AppIdPath -Name IconUri -ErrorAction SilentlyContinue).IconUri
+    if ($IconPath -ne "C:\ProgramData\Trusted IT\TrustedITIcon.ico") {
+        New-ItemProperty -Path $AppIdPath -Name IconUri -Value "C:\ProgramData\Trusted IT\TrustedITIcon.ico" -PropertyType String -Force | Out-Null
+    }
+}
+catch {
+    Write-Output "Could not set custom notification app: $_"
+}
+
+
+
 # ===[ Send Notification ]===
 switch ($Preset) {
     "Reboot" {
@@ -123,7 +147,7 @@ switch ($Preset) {
 
 
         try {
-            Submit-BTNotification -Content $Content
+            Submit-BTNotification -Content $Content -AppId "TrustedIT.Notifications"
         }
         catch {
             Write-Output "Error sending notification to user: $_"
@@ -154,7 +178,7 @@ switch ($Preset) {
 
 
         try {
-            Submit-BTNotification -Content $Content
+            Submit-BTNotification -Content $Content -AppId "TrustedIT.Notifications"
         }
         catch {
             Write-Output "Error sending notification to user: $_"
