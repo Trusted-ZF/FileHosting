@@ -150,37 +150,32 @@ catch {
 
 # ===[ Set Custom Notification App ]===
 Write-Host "Checking notification handler app."
-if (-not (Test-Path -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\TrustedIT.Notifications")) {
-    try {
-        Add-Content -Path $LogFile -Value "Creating notification handler app 'TrustedIT.Notifications'..."
-        New-BTAppId -AppId "TrustedIT.Notifications"
-        
-        $HKCR = Get-PSDrive -Name HKCR -ErrorAction SilentlyContinue
-        if (-not ($HKCR)) { New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT -Scope Script | Out-Null }
+try {
+    Add-Content -Path $LogFile -Value "Creating notification handler app 'TrustedIT.Notifications'..."
+    New-BTAppId -AppId "TrustedIT.Notifications"
+    
+    $HKCR = Get-PSDrive -Name HKCR -ErrorAction SilentlyContinue
+    if (-not ($HKCR)) { New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT -Scope Script | Out-Null }
 
-        $RegPath    = "HKCR:\AppUserModelId"
-        $AppIdPath  = "$RegPath\TrustedIT.Notifications"
-        if (-not (Test-Path $AppIdPath)) { New-Item -Path $RegPath -Name "TrustedIT.Notifications" -Force | Out-Null }
+    $RegPath    = "HKCR:\AppUserModelId"
+    $AppIdPath  = "$RegPath\TrustedIT.Notifications"
+    if (-not (Test-Path $AppIdPath)) { New-Item -Path $RegPath -Name "TrustedIT.Notifications" -Force | Out-Null }
 
-        $DisplayName = (Get-ItemProperty -Path $AppIdPath -Name DisplayName -ErrorAction SilentlyContinue).DisplayName
-        if ($DisplayName -ne "Trusted IT") {
-            New-ItemProperty -Path $AppIdPath -Name DisplayName -Value "Trusted IT" -PropertyType String -Force | Out-Null
-        }
-
-        $AppIconPath  = (Get-ItemProperty -Path $AppIdPath -Name IconUri -ErrorAction SilentlyContinue).IconUri
-        if ($AppIconPath -ne "$WorkingFolder\TrustedITIcon.ico") {
-            New-ItemProperty -Path $AppIdPath -Name IconUri -Value "$WorkingFolder\TrustedITIcon.ico" -PropertyType String -Force | Out-Null
-        }
-        Add-Content -Path $LogFile -Value "Created notification handler app successfully."
+    $DisplayName = (Get-ItemProperty -Path $AppIdPath -Name DisplayName -ErrorAction SilentlyContinue).DisplayName
+    if ($DisplayName -ne "Trusted IT") {
+        New-ItemProperty -Path $AppIdPath -Name DisplayName -Value "Trusted IT" -PropertyType String -Force | Out-Null
     }
-    catch {
-        Add-Content -Path $LogFile -Value "Could not set custom notification app: $_"
-        Stop-Transcript
-        exit 7
+
+    $AppIconPath  = (Get-ItemProperty -Path $AppIdPath -Name IconUri -ErrorAction SilentlyContinue).IconUri
+    if ($AppIconPath -ne "$WorkingFolder\TrustedITIcon.ico") {
+        New-ItemProperty -Path $AppIdPath -Name IconUri -Value "$WorkingFolder\TrustedITIcon.ico" -PropertyType String -Force | Out-Null
     }
+    Add-Content -Path $LogFile -Value "Created notification handler app successfully."
 }
-else {
-    Add-Content -Path $LogFile -Value "Notification app 'TrustedIT.Notifications' already exists."
+catch {
+    Add-Content -Path $LogFile -Value "Could not set custom notification app: $_"
+    Stop-Transcript
+    exit 7
 }
 
 
