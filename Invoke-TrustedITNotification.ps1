@@ -10,8 +10,20 @@ param (
     [Parameter(Mandatory = $true)]
     [ValidateSet("Reboot", "ServerProblem")]
     [string]
-    $Preset = "Reboot"
+    $Preset = "Reboot",
+
+    [Parameter(Mandatory = $false)]
+    [string]
+    $LogFile = "C:\ProgramData\Trusted IT\Logs\Toast.log"
 )
+
+
+
+# ===[ Start Logging ]===
+if (-not (Test-Path -Path $LogFile)) {
+    New-Item -Path $LogFile -ItemType File -Force
+}
+Start-Transcript
 
 
 
@@ -19,6 +31,7 @@ param (
 $AcceptedPresets = @("Reboot", "ServerProblem")
 if ("$Preset" -notin $AcceptedPresets) {
     Write-Output "Not an accepted preset. Try one of: $AcceptedPresets."
+    Stop-Transcript
     exit 1
 }
 
@@ -49,6 +62,7 @@ if (-not(Get-Module -Name BurntToast -ListAvailable)) {
     }
     catch {
         Write-Output "Could not install module: BurntToast: $_"
+        Stop-Transcript
         exit 2
     }
 }
@@ -65,6 +79,7 @@ try {
 }
 catch {
     Write-Output "Could not create working folder: $_"
+    Stop-Transcript
     exit 3
 }
 
@@ -78,6 +93,7 @@ try {
 }
 catch {
     Write-Output "Could not download hero image: $_"
+    Stop-Transcript
     exit 4
 }
 
@@ -91,6 +107,7 @@ try {
 }
 catch {
     Write-Output "Could not download app logo image: $_"
+    Stop-Transcript
     exit 5
 }
 
@@ -103,6 +120,7 @@ try {
 }
 catch {
     Write-Output "Could not download notification handler image: $_"
+    Stop-Transcript
     exit 6
 }
 
@@ -131,6 +149,7 @@ try {
 }
 catch {
     Write-Output "Could not set custom notification app: $_"
+    Stop-Transcript
     exit 7
 }
 
@@ -164,6 +183,7 @@ switch ($Preset) {
         }
         catch {
             Write-Output "Error when setting notification parameters: $_"
+            Stop-Transcript
             exit 8
         }
 
@@ -173,11 +193,13 @@ switch ($Preset) {
         }
         catch {
             Write-Output "Error sending notification to user: $_"
+            Stop-Transcript
             exit 9
         }
 
 
         Write-Output "Script completed!"
+        Stop-Transcript
         exit 0
     }
 
@@ -197,6 +219,7 @@ switch ($Preset) {
         }
         catch {
             Write-Output "Error when setting notification parameters: $_"
+            Stop-Transcript
             exit 8
         }
 
@@ -206,11 +229,13 @@ switch ($Preset) {
         }
         catch {
             Write-Output "Error sending notification to user: $_"
+            Stop-Transcript
             exit 9
         }
 
 
         Write-Output "Script completed!"
+        Stop-Transcript
         exit 0
     }
 }
