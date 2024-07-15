@@ -118,8 +118,8 @@ try {
         New-ItemProperty -Path $AppIdPath -Name DisplayName -Value "Trusted IT" -PropertyType String -Force | Out-Null
     }
 
-    $IconPath = (Get-ItemProperty -Path $AppIdPath -Name IconUri -ErrorAction SilentlyContinue).IconUri
-    if ($IconPath -ne "$WorkingFolder\TrustedITIcon.ico") {
+    $AppIconPath  = (Get-ItemProperty -Path $AppIdPath -Name IconUri -ErrorAction SilentlyContinue).IconUri
+    if ($AppIconPath -ne "$WorkingFolder\TrustedITIcon.ico") {
         New-ItemProperty -Path $AppIdPath -Name IconUri -Value "$WorkingFolder\TrustedITIcon.ico" -PropertyType String -Force | Out-Null
     }
 }
