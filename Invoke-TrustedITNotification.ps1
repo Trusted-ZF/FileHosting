@@ -24,32 +24,32 @@ if (-not (Test-Path -Path $LogFile)) {
     New-Item -Path $LogFile -ItemType File -Force
 }
 Start-Transcript -Path $LogFile -Append -UseMinimalHeader
-Write-Verbose "===[ NEW RUN - $(Get-Date -Format dd-MM-yyyy_hh-mm-ss) ]==="
+Write-Output "===[ NEW RUN - $(Get-Date -Format dd-MM-yyyy_hh-mm-ss) ]==="
 
 
 
 # ===[ Verify Technician Input ]===
-Write-Verbose "Checking technician input."
+Write-Output "Checking technician input."
 $AcceptedPresets = @("Reboot", "ServerProblem")
 if ("$Preset" -notin $AcceptedPresets) {
-    Write-Verbose "Not an accepted preset. Try one of: $AcceptedPresets."
+    Write-Output "Not an accepted preset. Try one of: $AcceptedPresets."
     Stop-Transcript
     exit 1
 }
 else {
-    Write-Verbose "The preset '$Preset' is valid. Continuing..."
+    Write-Output "The preset '$Preset' is valid. Continuing..."
 }
 
 
 
 # ===[ Create a Protocol ]===
-Write-Verbose "Checking protocol handlers."
+Write-Output "Checking protocol handlers."
 
 # Restarts immediately when the user clicks "Reboot Now" on the "Reboot" preset
 New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT -ErrorAction SilentlyContinue | Out-Null
 $Handler = Get-Item "HKCR:\TrustedITReboot" -ErrorAction SilentlyContinue
 if (-not $Handler) {
-    Write-Verbose "TrustedITReboot handler not found. Creating..."
+    Write-Output "TrustedITReboot handler not found. Creating..."
     New-Item -Path "HKCR:\TrustedITReboot" -Force
     Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "(DEFAULT)" -Value "TrustedITReboot" -Force
     Set-ItemProperty -Path "HKCR:\TrustedITReboot" -Name "URL Protocol" -Value "" -Force
@@ -57,23 +57,23 @@ if (-not $Handler) {
     
     New-Item -Path "HKCR:\TrustedITReboot\Shell\Open\Command" -Force
     Set-ItemProperty "HKCR:\TrustedITReboot\Shell\Open\Command" -Name "(DEFAULT)" -Value "C:\Windows\System32\shutdown.exe -r -t 00" -Force
-    Write-Verbose "TrustedITReboot handler has been created. Continuing..."
+    Write-Output "TrustedITReboot handler has been created. Continuing..."
 }
 else {
-    Write-Verbose "TrustedITReboot handler already exists. Continuing..."
+    Write-Output "TrustedITReboot handler already exists. Continuing..."
 }
 
 
 
 # ===[ Install Modules ]===
-Write-Verbose "Checking for modules."
+Write-Output "Checking for modules."
 if (-not(Get-Module -Name BurntToast -ListAvailable)) {
     try {
-        Write-Verbose "BurntToast module is not installed. Installing..."
+        Write-Output "BurntToast module is not installed. Installing..."
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
         Install-Module -Name BurntToast -Scope CurrentUser | Out-Null
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Untrusted
-        Write-Verbose "BurntToast module has been installed. Continuing..."
+        Write-Output "BurntToast module has been installed. Continuing..."
     }
     catch {
         Write-Output "Could not install module: BurntToast: $_"
@@ -86,10 +86,10 @@ Import-Module -Name BurntToast
 
 
 # ===[ Download Images ]===
-Write-Verbose "Checking images."
+Write-Output "Checking images."
 try {
     if (-not (Test-Path -Path "C:\ProgramData\Trusted IT")) {
-        Write-Verbose "Creating working folder..."
+        Write-Output "Creating working folder..."
         New-Item -Path "C:\ProgramData\Trusted IT" -ItemType Directory
     }
     $WorkingFolder = "C:\ProgramData\Trusted IT"
@@ -103,10 +103,10 @@ catch {
 
 try {
     if (-not (Test-Path -Path "$WorkingFolder\TrustedITLogo_Hero.jpg")) {
-        Write-Verbose "Downloading hero image..."
+        Write-Output "Downloading hero image..."
         $HeroURL    = "https://raw.githubusercontent.com/Trusted-ZF/ToastNotifications/main/TrustedITLogo_Hero.jpg"
         Invoke-WebRequest -Uri $HeroURL -OutFile "$WorkingFolder\TrustedITLogo_Hero.jpg"
-        Write-Verbose "Downloaded hero image successfully."
+        Write-Output "Downloaded hero image successfully."
     }
     $HeroPath = "$WorkingFolder\TrustedITLogo_Hero.jpg"
 }
@@ -119,10 +119,10 @@ catch {
 
 try {
     if (-not (Test-Path -Path "$WorkingFolder\TrustedITMSP_Icon.png")) {
-        Write-Verbose "Downloading MSP image..."
+        Write-Output "Downloading MSP image..."
         $IconURL    = "https://raw.githubusercontent.com/Trusted-ZF/ToastNotifications/main/TrustedITMSP_Icon.png"
         Invoke-WebRequest -Uri $IconURL -OutFile "$WorkingFolder\TrustedITMSP_Icon.png"
-        Write-Verbose "Downloaded MSP image successfully."
+        Write-Output "Downloaded MSP image successfully."
     }
     $IconPath   = "$WorkingFolder\TrustedITMSP_Icon.png"
 }
@@ -135,10 +135,10 @@ catch {
 
 try {
     if (-not (Test-Path -Path "$WorkingFolder\TrustedITIcon.ico")) {
-        Write-Verbose "Downloading app icon image..."
+        Write-Output "Downloading app icon image..."
         $IconURL    = "https://raw.githubusercontent.com/Trusted-ZF/ToastNotifications/main/TrustedITIcon.ico"
         Invoke-WebRequest -Uri $IconURL -OutFile "$WorkingFolder\TrustedITIcon.ico"
-        Write-Verbose "Downloaded app icon image successfully."
+        Write-Output "Downloaded app icon image successfully."
     }
 }
 catch {
@@ -153,7 +153,7 @@ catch {
 Write-Host "Checking notification handler app."
 if (-not (Test-Path -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\TrustedIT.Notifications")) {
     try {
-        Write-Verbose "Creating notification handler app 'TrustedIT.Notifications'..."
+        Write-Output "Creating notification handler app 'TrustedIT.Notifications'..."
         New-BTAppId -AppId "TrustedIT.Notifications"
         
         $HKCR = Get-PSDrive -Name HKCR -ErrorAction SilentlyContinue
@@ -172,7 +172,7 @@ if (-not (Test-Path -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notif
         if ($AppIconPath -ne "$WorkingFolder\TrustedITIcon.ico") {
             New-ItemProperty -Path $AppIdPath -Name IconUri -Value "$WorkingFolder\TrustedITIcon.ico" -PropertyType String -Force | Out-Null
         }
-        Write-Verbose "Created notification handler app successfully."
+        Write-Output "Created notification handler app successfully."
     }
     catch {
         Write-Output "Could not set custom notification app: $_"
@@ -181,7 +181,7 @@ if (-not (Test-Path -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notif
     }
 }
 else {
-    Write-Verbose "Notification app 'TrustedIT.Notifications' already exists."
+    Write-Output "Notification app 'TrustedIT.Notifications' already exists."
 }
 
 
@@ -190,7 +190,7 @@ else {
 switch ($Preset) {
     "Reboot" {
         try {
-            Write-Verbose "'Reboot' preset selected."
+            Write-Output "'Reboot' preset selected."
             $5Min = New-BTSelectionBoxItem -Id 5 -Content "5 Minutes"
             $10Min = New-BTSelectionBoxItem -Id 10 -Content "10 Minutes"
             $1Hour = New-BTSelectionBoxItem -Id 60 -Content "1 Hour"
@@ -212,7 +212,7 @@ switch ($Preset) {
             $Binding = New-BTBinding -Children $BTText1, $BTText2 -AppLogoOverride $IconImage -HeroImage $HeroImage
             $Visual = New-BTVisual -BindingGeneric $Binding
             $Content = New-BTContent -Visual $Visual -Audio $Audio -Duration Long -Scenario IncomingCall -Actions $ButtonHolder
-            Write-Verbose "Preset options loaded."
+            Write-Output "Preset options loaded."
         }
         catch {
             Write-Output "Error when setting notification parameters: $_"
@@ -222,9 +222,9 @@ switch ($Preset) {
 
 
         try {
-            Write-Verbose "Attempting to send notification."
+            Write-Output "Attempting to send notification."
             Submit-BTNotification -Content $Content -AppId "TrustedIT.Notifications"
-            Write-Verbose "Notification submimtted."
+            Write-Output "Notification submimtted."
         }
         catch {
             Write-Output "Error sending notification to user: $_"
@@ -240,7 +240,7 @@ switch ($Preset) {
 
     "ServerProblem" {
         try {
-            Write-Verbose "'ServerProblem' preset selected."
+            Write-Output "'ServerProblem' preset selected."
             $BTText = New-BTText -Text "We're aware of a problem with the server and we're working on it. We'll update you as soon as possible."
             $IconImage = New-BTImage -Source $IconPath -AppLogoOverride -Crop Circle
             $HeroImage = New-BTImage -Source $HeroPath -HeroImage
@@ -252,7 +252,7 @@ switch ($Preset) {
             $Binding = New-BTBinding -Children $BTText -AppLogoOverride $IconImage -HeroImage $HeroImage
             $Visual = New-BTVisual -BindingGeneric $Binding
             $Content = New-BTContent -Visual $Visual -Audio $Audio -Duration Long -Scenario IncomingCall -Actions $ButtonHolder
-            Write-Verbose "Preset options loaded."
+            Write-Output "Preset options loaded."
         }
         catch {
             Write-Output "Error when setting notification parameters: $_"
@@ -262,9 +262,9 @@ switch ($Preset) {
 
 
         try {
-            Write-Verbose "Attempting to send notification."
+            Write-Output "Attempting to send notification."
             Submit-BTNotification -Content $Content -AppId "TrustedIT.Notifications"
-            Write-Verbose "Notification submimtted."
+            Write-Output "Notification submimtted."
         }
         catch {
             Write-Output "Error sending notification to user: $_"
