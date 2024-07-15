@@ -23,7 +23,7 @@ param (
 if (-not (Test-Path -Path $LogFile)) {
     New-Item -Path $LogFile -ItemType File -Force
 }
-Start-Transcript -Path $LogFile
+Start-Transcript -Path $LogFile -Append -UseMinimalHeader
 Write-Verbose "===[ NEW RUN - $(Get-Date -Format dd-MM-yyyy_hh-mm-ss) ]==="
 
 
