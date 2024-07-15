@@ -19,6 +19,7 @@ param (
 $AcceptedPresets = @("Reboot", "ServerProblem")
 if ("$Preset" -notin $AcceptedPresets) {
     Write-Output "Not an accepted preset. Try one of: $AcceptedPresets."
+    exit 1
 }
 
 
@@ -48,6 +49,7 @@ if (-not(Get-Module -Name BurntToast -ListAvailable)) {
     }
     catch {
         Write-Output "Could not install module: BurntToast: $_"
+        exit 2
     }
 }
 Import-Module -Name BurntToast
@@ -63,6 +65,7 @@ try {
 }
 catch {
     Write-Output "Could not create working folder: $_"
+    exit 3
 }
 
 
@@ -75,6 +78,7 @@ try {
 }
 catch {
     Write-Output "Could not download hero image: $_"
+    exit 4
 }
 
 
@@ -87,6 +91,7 @@ try {
 }
 catch {
     Write-Output "Could not download app logo image: $_"
+    exit 5
 }
 
 
@@ -98,6 +103,7 @@ try {
 }
 catch {
     Write-Output "Could not download notification handler image: $_"
+    exit 6
 }
 
 
@@ -125,6 +131,7 @@ try {
 }
 catch {
     Write-Output "Could not set custom notification app: $_"
+    exit 7
 }
 
 
@@ -157,6 +164,7 @@ switch ($Preset) {
         }
         catch {
             Write-Output "Error when setting notification parameters: $_"
+            exit 8
         }
 
 
@@ -165,6 +173,7 @@ switch ($Preset) {
         }
         catch {
             Write-Output "Error sending notification to user: $_"
+            exit 9
         }
 
 
@@ -188,6 +197,7 @@ switch ($Preset) {
         }
         catch {
             Write-Output "Error when setting notification parameters: $_"
+            exit 8
         }
 
 
@@ -196,6 +206,7 @@ switch ($Preset) {
         }
         catch {
             Write-Output "Error sending notification to user: $_"
+            exit 9
         }
 
 
