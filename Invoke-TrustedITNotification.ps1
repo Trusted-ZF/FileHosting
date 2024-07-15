@@ -90,12 +90,26 @@ catch {
 }
 
 
+try {
+    if (-not (Test-Path -Path "$WorkingFolder\TrustedITIcon.ico")) {
+        $IconURL    = "https://raw.githubusercontent.com/Trusted-ZF/ToastNotifications/main/TrustedITIcon.ico"
+        Invoke-WebRequest -Uri $IconURL -OutFile "$WorkingFolder\TrustedITIcon.ico"
+    }
+}
+catch {
+    Write-Output "Could not download notification handler image: $_"
+}
+
+
 
 # ===[ Set Custom Notification App ]===
 try {
     New-BTAppId -AppId "TrustedIT.Notifications"
     
-    $RegPath    = "HKCU:\Software\Classes\AppUserModelId"
+    $HKCR = Get-PSDrive -Name HKCR -ErrorAction SilentlyContinue
+    if (-not ($HKCR)) { New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT -Scope Script | Out-Null }
+
+    $RegPath    = "HKCR:\AppUserModelId"
     $AppIdPath  = "$RegPath\TrustedIT.Notifications"
     if (-not (Test-Path $AppIdPath)) { New-Item -Path $RegPath -Name "TrustedIT.Notifications" -Force | Out-Null }
 
@@ -105,8 +119,8 @@ try {
     }
 
     $IconPath = (Get-ItemProperty -Path $AppIdPath -Name IconUri -ErrorAction SilentlyContinue).IconUri
-    if ($IconPath -ne "C:\ProgramData\Trusted IT\TrustedITIcon.ico") {
-        New-ItemProperty -Path $AppIdPath -Name IconUri -Value "C:\ProgramData\Trusted IT\TrustedITIcon.ico" -PropertyType String -Force | Out-Null
+    if ($IconPath -ne "$WorkingFolder\TrustedITIcon.ico") {
+        New-ItemProperty -Path $AppIdPath -Name IconUri -Value "$WorkingFolder\TrustedITIcon.ico" -PropertyType String -Force | Out-Null
     }
 }
 catch {
