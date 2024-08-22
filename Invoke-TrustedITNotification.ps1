@@ -9,7 +9,7 @@
 [CmdletBinding()]
 param (
     # Uses a preset notification template.
-    [ValidateSet("ADSyncAlert", "Reboot", "ServerProblem")]
+    [ValidateSet("Reboot", "ServerProblem")]
     [string]$Preset
 )
 
@@ -104,12 +104,6 @@ if ($AppIconPath -ne "$NotifyIcon") {
 
 # Handle templates
 switch ($Preset) {
-    "ADSyncAlert"	{
-        $BTHero		= New-BTImage -Source $HeroImage
-        $BTIcon		= New-BTImage -Source $IconImage
-        $TenantName	= (Get-MgOrganization).DisplayName
-        New-BurntToastNotification -Text "ADSync is not running for $TenantName!" -HeroImage $BTHero -AppLogo $BTIcon -AppId "TrustedIT.Notifications"
-    }
     "Reboot"		{
         $5Min		= New-BTSelectionBoxItem -Id 5 -Content "5 Minutes"
         $10Min		= New-BTSelectionBoxItem -Id 10 -Content "10 Minutes"
