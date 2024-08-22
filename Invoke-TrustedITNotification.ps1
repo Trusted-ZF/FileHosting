@@ -9,7 +9,7 @@
 [CmdletBinding()]
 param (
     # Uses a preset notification template.
-    [ValidateSet("Reboot")]
+    [ValidateSet("ADSyncAlert", "Reboot")]
     [string]$Preset
 )
 
@@ -59,8 +59,16 @@ if (-not (Test-Path -Path $NotifyIcon)) {
 
 
 
-# Create reboot handler
+# Clear old reboot handlers
 New-PSDrive -Name "HKCR" -PSProvider Registry -Root HKEY_CLASSES_ROOT -ErrorAction SilentlyContinue | Out-Null
+$HandlerPaths = @("HKCR:\TrustedIT.Reboot", "HKCR:\TrustedIT-Reboot", "HKCR:\TrustedITReboot")
+$HandlerPaths | ForEach-Object {
+    Remove-Item -Path $_ -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+
+
+# Create reboot handler
 $HandlerPath = "HKCR:\TrustedIT.Reboot"
 $Handler = Get-Item $HandlerPath -ErrorAction SilentlyContinue
 if (-not $Handler) {
@@ -74,6 +82,7 @@ if (-not $Handler) {
 
 
 
+# Clear old notification apps
 # Create notification handler app
 New-BTAppId -AppId "TrustedIT.Notifications"
 $RegPath	= "HKCR:\AppUserModelId"
@@ -96,6 +105,12 @@ if ($AppIconPath -ne "$NotifyIcon") {
 
 # Handle templates
 switch ($Preset) {
+    "ADSyncAlert"	{
+        $BTHero		= New-BTImage -Source $HeroImage
+        $BTIcon		= New-BTImage -Source $IconImage
+        $TenantName	= (Get-MgOrganization).DisplayName
+        New-BurntToastNotification -Text "ADSync is not running for $TenantName!" -HeroImage $BTHero -AppLogo $BTIcon -AppId "TrustedIT.Notifications"
+    }
     "Reboot"		{
         $5Min		= New-BTSelectionBoxItem -Id 5 -Content "5 Minutes"
         $10Min		= New-BTSelectionBoxItem -Id 10 -Content "10 Minutes"
