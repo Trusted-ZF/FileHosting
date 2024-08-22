@@ -9,7 +9,7 @@
 [CmdletBinding()]
 param (
     # Uses a preset notification template.
-    [ValidateSet("ADSyncAlert", "Reboot")]
+    [ValidateSet("ADSyncAlert", "Reboot", "ServerProblem")]
     [string]$Preset
 )
 
