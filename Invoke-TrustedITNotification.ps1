@@ -61,7 +61,7 @@ if (-not (Test-Path -Path $NotifyIcon)) {
 
 # Clear old reboot handlers
 New-PSDrive -Name "HKCR" -PSProvider Registry -Root HKEY_CLASSES_ROOT -ErrorAction SilentlyContinue | Out-Null
-$HandlerPaths = @("HKCR:\TrustedIT.Reboot", "HKCR:\TrustedIT-Reboot", "HKCR:\TrustedITReboot")
+$HandlerPaths = @("HKCR:\TrustedIT-Reboot", "HKCR:\TrustedITReboot")
 $HandlerPaths | ForEach-Object {
     Remove-Item -Path $_ -Recurse -Force -ErrorAction SilentlyContinue
 }
@@ -82,11 +82,10 @@ if (-not $Handler) {
 
 
 
-# Clear old notification apps
 # Create notification handler app
 New-BTAppId -AppId "TrustedIT.Notifications"
-$RegPath	= "HKCR:\AppUserModelId"
-$AppIdPath	= "$RegPath\TrustedIT.Notifications"
+$RegPath = "HKCR:\AppUserModelId"
+$AppIdPath = "$RegPath\TrustedIT.Notifications"
 if (-not (Test-Path -Path $AppIdPath)) {
     New-Item -Path $RegPath -Name "TrustedIT.Notifications" -Force | Out-Null
 }
@@ -134,6 +133,21 @@ switch ($Preset) {
         $BTBinding	= New-BTBinding -Children $BTText1, $BTText2 -HeroImage $BTHero -AppLogoOverride $BTIcon
         $BTVisual	= New-BTVisual -BindingGeneric $BTBinding
         $BTContent	= New-BTContent -Visual $BTVisual -Audio $BTAudio -Duration Long -Scenario IncomingCall -Actions $BTHolder
+        Submit-BTNotification -Content $BTContent -AppId "TrustedIT.Notifications"
+    }
+    "ServerProblem" {
+        $BTText     = New-BTText -Text "We're aware of a problem with the server and we're working on it. We'll update you as soon as possible."
+        $BTHero     = New-BTImage -Source $HeroImage -HeroImage
+        $BTIcon     = New-BTImage -Source $IconImage -AppLogoOverride -Crop Circle
+        $BTAudio    = New-BTAudio -Source ms-winsoundevent:Notification.Looping.Call2
+
+        $Action     = New-BTButton -Content "Please keep me updated." -Arguments "none"
+        $Dismiss    = New-BTButton -Content "I understand, thank you." -Dismiss
+        $BTHolder   = New-BTAction -Buttons $Dismiss, $Action
+
+        $BTBinding  = New-BTBinding -Children $BTText -HeroImage $BTHero -AppLogoOverride $BTIcon
+        $BTVisual   = New-BTVisual -BindingGeneric $BTBinding
+        $BTContent  = New-BTContent -Visual $BTVisual -Audio $BTAudio -Duration Long -Scenario IncomingCall -Actions $BTHolder
         Submit-BTNotification -Content $BTContent -AppId "TrustedIT.Notifications"
     }
 }
