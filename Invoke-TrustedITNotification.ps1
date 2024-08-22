@@ -15,10 +15,6 @@ param (
 
 
 
-$ErrorActionPreference = "Stop"
-
-
-
 # Create working folder and start logging
 $WorkingFolder = "C:\ProgramData\Trusted IT"
 if (-not (Test-Path -Path $WorkingFolder)) {
