@@ -45,7 +45,7 @@ if (-not (Get-Module -Name "BurntToast" -ListAvailable)) {
         Write-Output "Module BurntToast is not available. Installing..."
 
         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-        Install-Module -Name "BurntToast" -Scope CurrentUser -Verbose
+        Install-Module -Name "BurntToast" -Scope CurrentUser
         Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted
         
         Write-Output "Done."
@@ -54,6 +54,11 @@ if (-not (Get-Module -Name "BurntToast" -ListAvailable)) {
         Write-Output "[ERROR]: Could not install BurntToast module: $($_.Exception.Message)"
     }
 }
+
+
+
+# Add notification handler app
+New-BTAppId -AppId TrustedIT.Notifications
 
 
 
