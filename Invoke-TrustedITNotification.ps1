@@ -30,8 +30,9 @@ $LogFolder = "C:\ProgramData\Trusted IT\Logs\Notifications"
 if (-not (Test-Path -Path $LogFolder)) {
     New-Item -Path $LogFolder -ItemType Directory
 }
-$LogFile = New-Item -Path "$LogFolder\$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).log"
-Add-Content -Path $LogFile -Value "New notification run started."
+$LogFile = New-Item -Path "$LogFolder\User-$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).log"
+Start-Transcript -Path $LogFile
+Write-Output "New notification run started."
 
 
 
@@ -68,10 +69,10 @@ switch ($Preset) {
             $BTVisual	= New-BTVisual -BindingGeneric $BTBinding
             $BTContent	= New-BTContent -Visual $BTVisual -Audio $BTAudio -Duration Long -Scenario IncomingCall -Actions $BTHolder
             Submit-BTNotification -Content $BTContent -AppId "TrustedIT.Notifications"
-            Add-Content -Path $LogFile -Value "Notification submitted successfully."
+            Write-Output "Notification submitted successfully."
         }
         catch {
-            Add-Content -Path $LogFile -Value "[ERROR]: Could not submit notification: $($_.Exception.Message)"
+            Write-Output "[ERROR]: Could not submit notification: $($_.Exception.Message)"
         }
     }
     "serverproblem" {
@@ -89,10 +90,10 @@ switch ($Preset) {
             $BTVisual   = New-BTVisual -BindingGeneric $BTBinding
             $BTContent  = New-BTContent -Visual $BTVisual -Audio $BTAudio -Duration Long -Scenario IncomingCall -Actions $BTHolder
             Submit-BTNotification -Content $BTContent -AppId "TrustedIT.Notifications"
-            Add-Content -Path $LogFile -Value "Notification submitted successfully."
+            Write-Output "Notification submitted successfully."
         }
         catch {
-            Add-Content -Path $LogFile -Value "[ERROR]: Could not submit notification: $($_.Exception.Message)"
+            Write-Output "[ERROR]: Could not submit notification: $($_.Exception.Message)"
         }
     }
 }
