@@ -43,11 +43,7 @@ Write-Output "New notification run started."
 if (-not (Get-Module -Name "BurntToast" -ListAvailable)) {
     try {
         Write-Output "Module BurntToast is not available. Installing..."
-
-        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-        Install-Module -Name "BurntToast" -Scope CurrentUser
-        Set-PSRepository -Name "PSGallery" -InstallationPolicy Untrusted
-
+        Install-Module -Name "BurntToast" -Scope CurrentUser -Force
         Write-Output "Done."
     }
     catch {
