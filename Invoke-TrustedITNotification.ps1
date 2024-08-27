@@ -34,24 +34,23 @@ if (-not (Test-Path -Path $LogFolder)) {
     New-Item -Path $LogFolder -ItemType Directory
 }
 $LogFile = New-Item -Path "$LogFolder\User-$(Get-Date -Format yyyy-MM-dd_hh-mm-ss).log"
-Start-Transcript -Path $LogFile
-Write-Output "New notification run started."
+Add-Content -Path $LogFile -Value "New notification run started."
 
 
 
 # Install required BurntToast module
 if (-not (Get-Module -Name "BurntToast" -ListAvailable)) {
     try {
-        Write-Output "Module BurntToast is not available. Installing..."
+        Add-Content -Path $LogFile -Value "Module BurntToast is not available. Installing..."
 
         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
         Install-Module -Name "BurntToast" -Scope CurrentUser
         Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted
         
-        Write-Output "Done."
+        Add-Content -Path $LogFile -Value "Done."
     }
     catch {
-        Write-Output "[ERROR]: Could not install BurntToast module: $($_.Exception.Message)"
+        Add-Content -Path $LogFile -Value "[ERROR]: Could not install BurntToast module: $($_.Exception.Message)"
     }
 }
 
@@ -95,10 +94,10 @@ switch ($Preset) {
             $BTVisual	= New-BTVisual -BindingGeneric $BTBinding
             $BTContent	= New-BTContent -Visual $BTVisual -Audio $BTAudio -Duration Long -Scenario IncomingCall -Actions $BTHolder
             Submit-BTNotification -Content $BTContent -AppId "TrustedIT.Notifications"
-            Write-Output "Notification submitted successfully."
+            Add-Content -Path $LogFile -Value "Notification submitted successfully."
         }
         catch {
-            Write-Output "[ERROR]: Could not submit notification: $($_.Exception.Message)"
+            Add-Content -Path $LogFile -Value "[ERROR]: Could not submit notification: $($_.Exception.Message)"
         }
     }
     "serverproblem" {
@@ -116,12 +115,10 @@ switch ($Preset) {
             $BTVisual   = New-BTVisual -BindingGeneric $BTBinding
             $BTContent  = New-BTContent -Visual $BTVisual -Audio $BTAudio -Duration Long -Scenario IncomingCall -Actions $BTHolder
             Submit-BTNotification -Content $BTContent -AppId "TrustedIT.Notifications"
-            Write-Output "Notification submitted successfully."
+            Add-Content -Path $LogFile -Value "Notification submitted successfully."
         }
         catch {
-            Write-Output "[ERROR]: Could not submit notification: $($_.Exception.Message)"
+            Add-Content -Path $LogFile -Value "[ERROR]: Could not submit notification: $($_.Exception.Message)"
         }
     }
 }
-
-Stop-Transcript
