@@ -43,7 +43,7 @@ Write-Output "New notification run started."
 if (-not (Get-Module -Name "BurntToast" -ListAvailable)) {
     try {
         Write-Output "Module BurntToast is not available. Installing..."
-        Install-Module -Name "BurntToast" -Scope CurrentUser -Force
+        Install-Module -Name "BurntToast" -Scope CurrentUser -Force -Verbose
         Write-Output "Done."
     }
     catch {
