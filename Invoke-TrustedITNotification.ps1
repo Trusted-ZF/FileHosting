@@ -42,6 +42,18 @@ $IconImage = "$WorkingFolder\Icon-TrustedITMSP.png"
 
 
 
+# Enable notifications again if the user has disabled them
+$RegSettingsPath    = Get-ChildItem -Recurse -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings"
+$RegTruSettings     = $RegSettingsPath | Where-Object -Property Name -like "*TrustedIT.Notifications*"
+$RegPath            = $RegTruSettings.Name.Replace('HKEY_CURRENT_USER','HKCU:')
+$Enabled            = (Get-ItemProperty -Path $RegPath -Name "Enabled").Enabled
+
+if ($Enabled -ne 1) {
+    Set-ItemProperty -Path $RegPath -Name "Enabled" -Value 1 -Force
+}
+
+
+
 # Handle templates
 switch ($Preset) {
     "reboot"		{
