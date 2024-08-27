@@ -97,3 +97,5 @@ switch ($Preset) {
         }
     }
 }
+
+Stop-Transcript
