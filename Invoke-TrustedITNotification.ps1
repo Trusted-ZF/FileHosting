@@ -36,6 +36,24 @@ Write-Output "New notification run started."
 
 
 
+# Install required BurntToast module
+if (-not (Get-Module -Name "BurntToast" -ListAvailable)) {
+    try {
+        Write-Output "Module BurntToast is not available. Installing..."
+
+        Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+        Install-Module -Name "BurntToast" -Scope CurrentUser -AcceptLicense:$true | Out-Null
+        Set-PSRepository -Name "PSGallery" -InstallationPolicy Untrusted
+
+        Write-Output "Done."
+    }
+    catch {
+        Write-Output "[ERROR]: Could not install BurntToast module: $($_.Exception.Message)"
+    }
+}
+
+
+
 # Set image locations
 $HeroImage = "$WorkingFolder\Hero-TrustedITLogo.jpg"
 $IconImage = "$WorkingFolder\Icon-TrustedITMSP.png"
