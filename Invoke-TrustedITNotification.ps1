@@ -9,7 +9,6 @@
 [CmdletBinding()]
 param (
     # Uses a preset notification template.
-    [ValidateSet("Reboot", "ServerProblem")]
     [string]$Preset
 )
 
@@ -17,6 +16,10 @@ param (
 
 # Validate parameters
 $Preset = $Preset.ToLower()
+$AcceptedPresets = @("reboot", "serverproblem")
+if ($Preset -notin $AcceptedPresets) {
+    exit "Invalid preset."
+}
 
 
 
@@ -42,7 +45,7 @@ if (-not (Get-Module -Name "BurntToast" -ListAvailable)) {
         Write-Output "Module BurntToast is not available. Installing..."
 
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
-        Install-Module -Name "BurntToast" -Scope CurrentUser | Out-Null
+        Install-Module -Name "BurntToast" -Scope CurrentUser -AcceptLicense:$true | Out-Null
         Set-PSRepository -Name "PSGallery" -InstallationPolicy Untrusted
 
         Write-Output "Done."
