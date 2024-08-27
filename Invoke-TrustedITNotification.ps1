@@ -43,7 +43,12 @@ Write-Output "New notification run started."
 if (-not (Get-Module -Name "BurntToast" -ListAvailable)) {
     try {
         Write-Output "Module BurntToast is not available. Installing..."
-        Install-Module -Name "BurntToast" -Scope CurrentUser -Force -Verbose
+
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+        Install-Module -Name "BurntToast" -Scope CurrentUser -Verbose
+        Set-PSRepository -Name PSGallery -InstallationPolicy Untrusted
+        
         Write-Output "Done."
     }
     catch {
