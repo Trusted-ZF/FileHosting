@@ -169,7 +169,7 @@ switch ($Preset) {
 
             $Action		= New-BTButton -Content "Install now" -Arguments "none"
             $Dismiss	= New-BTButton -Content "Install later" -Snooze -Id "SnoozeTime"
-            $BTHolder   = New-BTAction -Buttons $Dismiss, $Action
+            $BTHolder   = New-BTAction -Buttons $Dismiss, $Action -Inputs $Selection
 
             $BTBinding	= New-BTBinding -Children $BTText1, $BTText2 -HeroImage $BTHero -AppLogoOverride $BTIcon
             $BTVisual	= New-BTVisual -BindingGeneric $BTBinding
